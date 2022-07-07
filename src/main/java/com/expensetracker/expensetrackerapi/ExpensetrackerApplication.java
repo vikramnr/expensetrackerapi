@@ -1,16 +1,32 @@
 package com.expensetracker.expensetrackerapi;
 
 import com.expensetracker.expensetrackerapi.filter.AuthFilter;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @SpringBootApplication
 public class ExpensetrackerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ExpensetrackerApplication.class, args);
+	}
+
+	@Bean
+	public FilterRegistrationBean<CorsFilter> corsFilterFilterRegistrationBean() {
+		FilterRegistrationBean<CorsFilter> corsFilterFilterRegistrationBean = new FilterRegistrationBean<>();
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.addAllowedOrigin("*");
+		config.addAllowedHeader("*");
+		source.registerCorsConfiguration("/**",config);
+		corsFilterFilterRegistrationBean.setFilter(new CorsFilter());
+		corsFilterFilterRegistrationBean.setOrder(0);
+		return corsFilterFilterRegistrationBean;
 	}
 
 	@Bean

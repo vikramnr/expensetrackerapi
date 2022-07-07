@@ -26,6 +26,11 @@ public class TransactionRepositoryImpl implements TransactionRepository{
     private static final String FIND_ALL_SQL = "SELECT TRANSACTION_ID,CATEGORY_ID,USER_ID,AMOUNT,NOTE,TRANSACTION_DATE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND " +
             "CATEGORY_ID = ?";
 
+    private static final String UPDATE_SQL = "UPDATE ET_TRANSACTIONS SET AMOUNT = ?, NOTE=?, TRANSACTION_DATE =? WHERE USER_ID = ? AND " +
+            "CATEGORY_ID = ? AND TRANSACTION_ID = ?";
+
+    private static final String DELETE_SQL = "DELETE FROM ET_TRANSACTIONS WHERE USER_ID = ? AND CATEGORY_ID = ? AND TRANSACTION_ID = ?";
+
     @Override
     public List<Transaction> findAll(Integer userId, Integer categoryId) {
         return jdbcTemplate.query(FIND_ALL_SQL,new Object[]{userId, categoryId},transactionRowMapper);
@@ -67,12 +72,21 @@ public class TransactionRepositoryImpl implements TransactionRepository{
 
     @Override
     public void update(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) throws EtBadRequestException {
-
+        try{
+            jdbcTemplate.update(UPDATE_SQL,new Object[]{transaction.getAmount(),transaction.getNote(),transaction.getTransactionDate(),userId,categoryId,transactionId});
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            throw new EtBadRequestException("Unable to update. Failed in db operation");
+        }
     }
 
     @Override
     public void removeById(Integer userId, Integer categoryId, Integer transactionId) throws EtResourceNotFoundException {
-
+        int count = jdbcTemplate.update(DELETE_SQL,new Object[]{userId,categoryId,transactionId});
+            if(count == 0){
+                throw new EtResourceNotFoundException("Transaction Not found");
+            }
     }
 
     private RowMapper<Transaction> transactionRowMapper = ((rs, rowNum) -> {

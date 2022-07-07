@@ -40,12 +40,19 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     @Override
-    public void updateTransaction(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) throws EtBadRequestException {
-
+    public Boolean updateTransaction(Integer userId, Integer categoryId, Integer transactionId, Transaction transaction) throws EtBadRequestException {
+        try {
+            transactionRepository.update(userId, categoryId, transactionId, transaction);
+            return true;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            throw new EtBadRequestException("Unable to update transaction");
+        }
     }
 
     @Override
     public void removeTransaction(Integer userId, Integer categoryId, Integer transactionId) throws EtResourceNotFoundException {
-
+        transactionRepository.removeById(userId,categoryId,transactionId);
     }
 }
